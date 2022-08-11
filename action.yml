@@ -1,0 +1,77 @@
+name: "Run Go Terraform Tests"
+description: "Run a group of Go test suites against a given set of fixtures"
+inputs:
+  go-version:
+    description: "the version of Go used for the provided test suites"
+    required: true
+  terraform-version:
+    description: "the version of Terraform used for the provided fixtures"
+    required: true
+  fixtures-directory:
+    description: "path to the fixtures to run the test suites against"
+    required: true
+  test-files-directory:
+    description: "path to the test suites to run against the fixtures"
+    required: true
+  aws-access-key-id:
+    description: "your AWS Access Key ID for the fixtures"
+    required: true
+  aws-secret-access-key:
+    description: "your AWS Secret Access Key for the fixtures"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-node@v1
+    - uses: actions/setup-go@v1
+      with:
+        go-version: ${{ inputs.go-version }}
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: ${{ inputs.terraform-version }}
+        terraform_wrapper: false
+
+    - name: Terraform Format
+      id: fmt
+      run: terraform fmt -check
+
+    - name: Terraform Fixtures
+      id: init
+      run: terraform init
+
+    - name: Terraform Validate Fixtures
+      id: validate
+      run: terraform validate
+
+    - name: Terraform Format Fixtures
+      id: fmt-fixtures
+      run: terraform fmt -check
+      working-directory: ${{ inputs.fixtures-directory }}
+
+    - name: Terraform Init Fixtures
+      id: init-fixtures
+      run: terraform init
+      working-directory: ${{ inputs.fixtures-directory }}
+
+    - name: Terraform Validate Fixtures
+      id: validate-fixtures
+      run: terraform validate
+      working-directory: ${{ inputs.fixtures-directory }}
+
+    - name: Go Format
+      id: gofmt
+      run: gofmt -l .
+      working-directory: ${{ inputs.test-files-directory }}
+
+    - name: Download Go Modules
+      working-directory: ${{ inputs.test-files-directory }}
+      run: go mod download
+
+    - name: Run Go Tests
+      working-directory: ${{ inputs.test-files-directory }}
+      run: go test -v
+      env:
+        AWS_ACCESS_KEY_ID: ${{ input.aws-access-key-id }}
+        AWS_SECRET_ACCESS_KEY: ${{ input.aws-secret-access-key }}
