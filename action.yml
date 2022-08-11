@@ -36,42 +36,51 @@ runs:
     - name: Terraform Format
       id: fmt
       run: terraform fmt -check
+      shell: bash
 
     - name: Terraform Fixtures
       id: init
       run: terraform init
+      shell: bash
 
     - name: Terraform Validate Fixtures
       id: validate
       run: terraform validate
+      shell: bash
 
     - name: Terraform Format Fixtures
       id: fmt-fixtures
       run: terraform fmt -check
+      shell: bash
       working-directory: ${{ inputs.fixtures-directory }}
 
     - name: Terraform Init Fixtures
       id: init-fixtures
       run: terraform init
+      shell: bash
       working-directory: ${{ inputs.fixtures-directory }}
 
     - name: Terraform Validate Fixtures
       id: validate-fixtures
       run: terraform validate
+      shell: bash
       working-directory: ${{ inputs.fixtures-directory }}
 
     - name: Go Format
       id: gofmt
       run: gofmt -l .
+      shell: bash
       working-directory: ${{ inputs.test-files-directory }}
 
     - name: Download Go Modules
       working-directory: ${{ inputs.test-files-directory }}
       run: go mod download
+      shell: bash
 
     - name: Run Go Tests
       working-directory: ${{ inputs.test-files-directory }}
       run: go test -v
+      shell: bash
       env:
         AWS_ACCESS_KEY_ID: ${{ input.aws-access-key-id }}
         AWS_SECRET_ACCESS_KEY: ${{ input.aws-secret-access-key }}
