@@ -82,5 +82,5 @@ runs:
       run: go test -v
       shell: bash
       env:
-        AWS_ACCESS_KEY_ID: ${{ input.aws-access-key-id }}
-        AWS_SECRET_ACCESS_KEY: ${{ input.aws-secret-access-key }}
+        AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
